@@ -1,0 +1,62 @@
+import random
+import time
+import matplotlib.pyplot as plt
+from IPython.display import clear_output
+
+# Step 1: Generate random traffic for 4 lanes
+def generate_traffic():
+    return {
+        "North": random.randint(0, 30),
+        "South": random.randint(0, 30),
+        "East": random.randint(0, 30),
+        "West": random.randint(0, 30),
+    }
+
+# Step 2: Calculate green light times proportionally
+def calculate_green_times(traffic_data):
+    total = sum(traffic_data.values())
+    green_times = {}
+    for lane, count in traffic_data.items():
+        green_times[lane] = int((count / total) * 60) if total > 0 else 15
+    return green_times
+
+# Step 3: Simulate traffic light changes
+def run_traffic_lights(green_times):
+    for lane, green_time in green_times.items():
+        print(f"\n🔛 GREEN Light for {lane} lane ({green_time} seconds)")
+        for t in range(green_time, 0, -1):
+            print(f"{lane} GREEN - {t} sec", end="\r")
+            time.sleep(0.1)
+        print(f"{lane} 🔴 RED")
+
+# Step 4: Plot the current traffic
+def plot_traffic(traffic_data):
+    lanes = list(traffic_data.keys())
+    counts = list(traffic_data.values())
+    plt.figure(figsize=(8, 4))
+    bars = plt.bar(lanes, counts, color=['blue', 'green', 'orange', 'red'])
+    plt.title("📊 Traffic Density per Lane")
+    plt.xlabel("Lane")
+    plt.ylabel("Number of Vehicles")
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + 0.15, yval + 1, yval)
+    plt.ylim(0, 40)
+    plt.show()
+
+# Step 5: Loop for multiple cycles
+def run_simulation():
+    while True:
+        clear_output(wait=True)
+        print("🚦 Simulating Smart Traffic Management...\n")
+        traffic_data = generate_traffic()
+        plot_traffic(traffic_data)
+        green_times = calculate_green_times(traffic_data)
+        run_traffic_lights(green_times)
+        again = input("\n🔁 Run another cycle? (y/n): ").lower()
+        if again != 'y':
+            print("Simulation ended.")
+            break
+
+# Run the simulation
+run_simulation()
